@@ -1,5 +1,19 @@
 # Release readiness and stable operation
 
+## Native map patch 0.2.1 — 2026-11-22
+
+Source2f7dd7e, Stable delivery9bc70fc, release workflow45051362906 passed.
+Removed the direct OSM/Leaflet preview: the no-referrer response policy conflicts
+with OSM browser-tile identification requirements. Native map navigation leaves
+Ingress through target _top; no external tile domain is allowed by app CSP.
+308 isolated app tests passed, including browser navigation/no-tile regression.
+GitHub app, native, hassfest, protocol and fresh Stable image checks passed.
+MCP verified installed0.2.1 started/protected with AppArmor profile and /health200.
+No authentication/storage change, data migration, Core restart or Edge update.
+Only the Edge integration was loaded at inspection; owner approval of the Stable
+Supervisor discovery is required for Stable HA trackers/map/history. A desktop
+visual check after that approval remains user validation.
+
 ## Official 0.2.0 publication and installation — 2026-11-22
 
 Published non-prerelease tag v0.2.0 at source6b20785599a854c5cf73035a5c2d9054f0fc18c5;
