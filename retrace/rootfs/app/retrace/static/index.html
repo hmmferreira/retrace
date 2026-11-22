@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Retrace</title><link rel="icon" type="image/png" sizes="256x256" href="static/retrace-icon.png"><link rel="apple-touch-icon" sizes="180x180" href="static/apple-touch-icon.png"><link rel="stylesheet" href="static/style.css"><link rel="stylesheet" href="static/vendor/leaflet.css"><script defer src="static/vendor/leaflet.js"></script><script defer src="static/app.js"></script></head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Retrace</title><link rel="icon" type="image/png" sizes="256x256" href="static/retrace-icon.png"><link rel="apple-touch-icon" sizes="180x180" href="static/apple-touch-icon.png"><link rel="stylesheet" href="static/style.css"><script defer src="static/app.js"></script></head>
 <body><main>
 <header><div class="brand-heading"><img class="brand-icon" src="static/retrace-icon.png" width="56" height="56" alt=""><div><h1 id="app-title">Retrace</h1><p>Location history · Apple Find My support</p></div></div><span id="health" role="status">Connecting…</span></header>
 <nav aria-label="Views"><button data-tab="overview" aria-selected="true">Items</button><button data-tab="setup" aria-selected="false">Setup</button></nav>
@@ -9,9 +9,9 @@
 <div id="message" class="notice" role="status" aria-live="polite" hidden></div>
 <section id="overview">
 <p id="poll-summary" class="muted" role="status"></p>
-<div class="notice info"><strong>Home Assistant map and history</strong><p>Approve the discovered Retrace integration to create native trackers, zones and history. Each app installation keeps separate trackers.</p><a href="/config/integrations/dashboard" target="_top">Open Devices &amp; services</a> · <a href="/map" target="_top">Open Home Assistant map</a></div>
+<div id="native-map" class="notice info"><h2>Map and location history</h2><p>View your items with Home Assistant’s native map. For a history trail, add a Map card to a dashboard, select your Retrace trackers and set Hours to show.</p><p><a id="open-native-map" class="primary-link" href="/map" target="_top">Open Home Assistant map</a></p><p class="muted">Missing items? Approve this installation’s discovered Retrace integration in <a href="/config/integrations/dashboard" target="_top">Devices &amp; services</a>. Stable and Edge have separate trackers. Only items with a reported location appear on the map; history follows Recorder retention.</p></div>
 <div id="cards" class="cards"></div>
-<details id="map-preview"><summary>Preview last known locations in this app</summary><div id="map" aria-label="Last known item locations"></div><p class="muted">Optional OpenStreetMap preview. This does not use Home Assistant's map card. Map tiles load when you open the preview.</p></details>
+
 <p class="muted">Refresh asks Apple for its latest report; it cannot make an AirTag report live. Each item can be requested once per minute. Apple rate-limit pauses always apply.</p>
 </section>
 <section id="setup" hidden>

@@ -457,3 +457,21 @@ test("fresh stable selects macOS and requires local consent before clearing cred
     assert.equal(env.requests.find(r=>r.url==="ui/login").body.native_component_consent,true);
   }finally{env.close();}
 });
+
+test("map navigation leaves ingress for native HA without external tile requests",async()=>{
+  const env=await setup();try{
+    const link=env.document.getElementById("open-native-map");
+    assert.equal(link.getAttribute("href"),"/map");
+    assert.equal(link.getAttribute("target"),"_top");
+    assert.match(env.document.getElementById("native-map").textContent,/Hours to show/);
+    assert.match(env.document.getElementById("native-map").textContent,/Stable and Edge/);
+    assert.equal(env.document.querySelector("#map-preview"),null);
+    assert.equal(env.document.querySelector('[src*="leaflet"], [href*="leaflet"]'),null);
+    assert.doesNotMatch(script,/tile\.openstreetmap|L\.map\(/);
+    env.document.querySelector('[data-tab="setup"]').click();
+    env.document.querySelector('[data-tab="overview"]').click();
+    await env.refresh();
+    assert.equal(env.document.getElementById("overview").hidden,false);
+    assert.equal(env.requests.every(request=>!request.url.startsWith("http")),true);
+  }finally{env.close();}
+});

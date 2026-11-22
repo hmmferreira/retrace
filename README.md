@@ -6,7 +6,7 @@ Location history for your belongings in Home Assistant. **Supports Apple Find My
 items and devices** with guided account setup, item selection, native trackers
 and timestamped sightings. Other tracking sources are a future direction.
 
-## Install Retrace 0.2.0
+## Install Retrace 0.2.1
 
 Add the [Stable app repository](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fhmmferreira%2Fretrace%23stable),
 then install **Retrace** in Home Assistant Apps. The repository URL is
@@ -20,9 +20,9 @@ passcodes are transient. Select items, save, and approve the discovered integrat
 No laptop or Mac needs to stay running.
 
 The companion integration is a separate HACS/custom Integration repository,
-`hmmferreira/retrace`, release `v0.2.0`. Updating its code may need a Core restart.
+`hmmferreira/retrace`, release `v0.2.1`. Updating its code may need a Core restart.
 Existing compatible Retrace companion installations can discover the new app.
-Read the [release notes](docs/releases/0.2.0.md) and [setup documentation](retrace/DOCS.stable.md).
+Read the [release notes](docs/releases/0.2.1.md) and [setup documentation](retrace/DOCS.stable.md).
 
 ## Stable and Edge
 
