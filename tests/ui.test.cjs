@@ -435,3 +435,25 @@ test("enabled Mac provider is selectable and sent explicitly without changing de
     assert.equal(env.requests.find(call=>call.url==="ui/login").body.provider,"macos");
   }finally{env.close();}
 });
+
+test("fresh stable selects macOS and requires local consent before clearing credentials",async()=>{
+  const env=await setup({shared:true,connected:false,auth:{phase:"idle"}});try{
+    env.data.channel="stable";
+    env.data.setup.default_authentication_provider="macos";
+    env.data.setup.native_component_consent_required=true;
+    env.data.setup.authentication_providers=[{id:"apple_music",available:false},{id:"macos",available:true}];
+    await env.refresh();
+    assert.equal(env.document.getElementById("authentication-provider").value,"macos");
+    assert.equal(env.document.getElementById("native-component-notice").hidden,false);
+    const form=env.document.getElementById("login");
+    form.elements.namedItem("email").value="fixture@example.invalid";
+    form.elements.namedItem("password").value="synthetic-password";
+    env.document.getElementById("consent").checked=true;
+    submit(env,"login");await flush();
+    assert.equal(form.elements.namedItem("password").value,"synthetic-password");
+    assert.equal(env.requests.filter(r=>r.url==="ui/login").length,0);
+    env.document.getElementById("native-component-consent").checked=true;
+    submit(env,"login");await flush();
+    assert.equal(env.requests.find(r=>r.url==="ui/login").body.native_component_consent,true);
+  }finally{env.close();}
+});

@@ -1,3 +1,6 @@
+> Historical legacy/Edge observations follow. For the official0.2.0 macOS provider,
+> current setup, scope and licensing disclosure, read releases/0.2.0.md.
+
 # Release readiness and known limitations
 
 Verified 2026-11-16 against the installed Edge app:

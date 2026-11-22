@@ -60,9 +60,13 @@ native/dependency security/license review, then source-build stable packaging.
 
 Keep original Edge, Shared Edge and stable storage/identities distinct. Use the
 repository renderers and normal fast-forward delivery; never edit generated
-packages alone or force-push. Shared stable rendering is deliberately blocked.
-Do not remove that gate or enable private evaluation by default to ship a release.
-Native rights/provenance and credential-boundary reviews remain release gates.
+packages alone or force-push. The owner explicitly authorized the first official release after reviewing the
+unresolved native licensing finding (2026-11-22). Version-specific release records
+allow source-build Stable publication with that uncertainty disclosed. Never mark
+Apple permission approved, ship Apple binaries, enable private evaluation by
+default, or acquire the native component before explicit local operational consent.
+Credential-boundary/security checks and immutable versioned publication remain
+mandatory. The authorization is not legal clearance or permission from Apple.
 Verify installed version, protection and readiness through HA after deployment;
 an uncertain lifecycle result must be read back before retry. Preserve sessions and selected items within the current Retrace installation;
 never import pre-rename sessions or identities implicitly. HTTP readiness does not

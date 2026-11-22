@@ -84,10 +84,13 @@ def make_app(store, *, management=False, trusted_peer="172.30.32.2", flow=None, 
             if shared_ui is not None:
                 data["setup"]["shared_auth"]=True
                 data["setup"]["authentication_providers"]=[
-                    {"id":"apple_music","label":"Apple Music provider","available":True},
+                    {"id":"apple_music","label":"Apple Music provider","available":bool(getattr(shared_ui,"apple_music_available",True))},
                     {"id":"macos","label":"macOS provider (experimental)","available":bool(getattr(shared_ui,"macos_available",False))}]
                 from .private_session_store import active_provider
                 data["setup"]["authentication_provider"]=await asyncio.to_thread(active_provider,store.root)
+                data["setup"]["default_authentication_provider"]=getattr(shared_ui,'default_provider','apple_music')
+                required=getattr(shared_ui,'native_consent_required',lambda:False)
+                data["setup"]["native_component_consent_required"]=await asyncio.to_thread(required)
                 data["auth"]=shared_ui.auth_visible(owner)
         return web.json_response(data)
 
@@ -117,12 +120,18 @@ def make_app(store, *, management=False, trusted_peer="172.30.32.2", flow=None, 
         owner=request.headers["X-Remote-User-Id"]
         if shared_ui is not None:
             if data.get("discovery_consent") is not True:raise ValueError()
-            provider=data.get("provider","apple_music")
+            provider=data.get("provider",getattr(shared_ui,'default_provider','apple_music'))
+            native=data.get('native_component_consent',False)
+            if type(native) is not bool:raise ValueError()
+            if provider=='apple_music' and not getattr(shared_ui,'apple_music_available',True):
+                return web.json_response({'error':'provider_unavailable','message':'Apple Music is not enabled in this installation.'},status=409)
+            if provider=='macos' and not native and await asyncio.to_thread(getattr(shared_ui,'native_consent_required',lambda:False)):
+                return web.json_response({'error':'native_consent_required','message':'Review the Apple component notice and allow local acquisition before connecting.'},status=409)
             if provider=="macos" and not getattr(shared_ui,"macos_available",False):
                 return web.json_response({"error":"provider_unavailable",
                     "message":"The experimental macOS provider is not ready in this build. Your existing connection has not changed."},status=409)
             if provider not in ("apple_music","macos"):raise ValueError()
-            data=await shared_ui.authenticate(owner,lambda:worker.login(owner,email,password,**({"provider":"macos"} if provider=="macos" else {})))
+            data=await shared_ui.authenticate(owner,lambda:worker.login(owner,email,password,**({"provider":"macos",**({"native_consent":True} if native else {})} if provider=="macos" else {})))
             return web.json_response(data,status=202)
         return web.json_response(await worker.login(owner,email,password))
 

@@ -6,8 +6,10 @@ or an independent security audit. No maintainer/Apple/legal adviser was contacte
 
 ## Result
 
-**Public stable publication remains blocked by unresolved Apple component-use
-permission.** Security hardening and source-build/review packaging can proceed.
+**Apple component-use permission remains unresolved.** After this review, the
+maintainer explicitly authorized the first official source-only release with that
+uncertainty disclosed. The earlier publication hold is superseded by that decision;
+this is not Apple permission or a change to the legal assessment.
 A passing checksum, successful login, local download or user checkbox does not
 establish permission. This review does not conclude that use is unlawful either.
 
@@ -101,7 +103,7 @@ Stable starts fresh and never inherits Edge identities, selections, credentials
 or history. Edge remains discardable development data. Extended field reliability
 and additional recovery scenarios continue after release; they are not an indefinite
 soak gate. Automated security regressions and honest limitation disclosure remain.
-Stable publication must not be marked approved while Apple permission is unresolved.
+Stable publication records must continue to disclose unresolved Apple permission; maintainer publication authorization is not native-rights approval.
 
 
 ## Validation and packaging outcome
@@ -119,3 +121,14 @@ source commit, intended0.2.0 stable channel, `history_migration:false`, and expl
 renderer/workflow gate remains intact. The archive contains no Apple binaries,
 private state, credentials or implied license approval. Package mechanics are
 ready for review; it must not be advertised as an approved Stable installer.
+
+
+## Official release decision — 2026-11-22
+
+The owner explicitly requested first official publication despite the findings.
+`release/0.2.0.json` authorizes source-only publication, excludes Apple binaries,
+requires local operational consent and prohibits history migration. Stable starts
+without an Android artifact or Apple download; protected Setup acquires the fixed
+macOS component only after explicit consent. Private evaluation remains disabled
+by default. No native license field has been relabelled approved. Release notes
+retain the uncertainty and field-validation limitations.

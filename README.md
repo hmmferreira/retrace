@@ -2,125 +2,83 @@
 
 <img src="retrace/icon.png" alt="Retrace icon" width="96" height="96">
 
-Location history for your belongings in Home Assistant. **Currently supports
-Apple Find My items and devices**, with guided account setup, latest reported
-locations and timestamped sightings recorded through Home Assistant. Other
-tracking sources are a future direction, not currently implemented.
+Location history for your belongings in Home Assistant. **Supports Apple Find My
+items and devices** with guided account setup, item selection, native trackers
+and timestamped sightings. Other tracking sources are a future direction.
 
-Retrace is an independent community project, not affiliated with or endorsed by
-Apple. It runs independently of an existing MQTT tracker. Development remains
-experimental; sparse sightings are not continuous GPS tracking.
+## Install Retrace 0.2.0
 
-This version uses a new Retrace integration and app identity. See the
-[clean-install procedure](docs/BRANDING.md) before replacing an older installation.
+Add the [Stable app repository](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fhmmferreira%2Fretrace%23stable),
+then install **Retrace** in Home Assistant Apps. The repository URL is
+`https://github.com/hmmferreira/retrace#stable`. Home Assistant builds locally;
+no public prebuilt image or Apple binary is supplied by this project.
 
-## User journey
-1. Open the app through Home Assistant ingress.
-2. Connect the polling account and choose SMS or trusted-device 2FA.
-3. Discover items through guided key recovery. Accept the Keychain trust
-   explanation, authenticate, choose a trusted device, and enter its unlock passcode.
-4. Select items with checkboxes. New items start disabled; rediscovery keeps choices.
-5. Approve the discovered native integration. It creates separate channel-specific devices,
-   GPS trackers and last-sighting sensors. HA zones and Recorder handle history.
-6. Open Items for the overview and optional map preview. Add items later in Setup.
+Start the app, open its Web UI and follow Setup: review local native-component
+consent, connect your Apple account, complete Apple verification and recover item
+keys using a trusted device's unlock passcode if requested. Passwords, codes and
+passcodes are transient. Select items, save, and approve the discovered integration.
+No laptop or Mac needs to stay running.
 
-The legacy runtime uses separate polling and recovery sessions. Shared Edge
-reuses the main account with a separate trusted-device unlock for key recovery.
-No Mac needs to stay running. Shared Edge still relies on third-party protocol
-code and native components: see [ownership and trust boundaries](docs/DEPENDENCY_BOUNDARY.md).
+The companion integration is a separate HACS/custom Integration repository,
+`hmmferreira/retrace`, release `v0.2.0`. Updating its code may need a Core restart.
+Existing compatible Retrace companion installations can discover the new app.
+Read the [release notes](docs/releases/0.2.0.md) and [setup documentation](retrace/DOCS.stable.md).
 
-## Status and limits
-This is development source, not a published or security-audited release.
-Transport/recovery tests use synthetic credentials without Apple network access.
-Repository Edge has partial real-account validation on Home Assistant OS;
-this does not complete the release/security checklist. Only amd64 is targeted.
-Minimum tested Core is 2026.9.3, with Supervisor 2026.11.0+ required for trusted
-administrator group headers. Home Assistant Container without Supervisor is not
-supported by this app installation path.
-Battery status and street addresses are not available from this report source.
-History follows the user's Recorder configuration; no retention period or backfill
-is promised. Sparse sightings are not a continuous GPS track.
+## Stable and Edge
 
-## Packaging
-- retrace/: Supervisor app, ingress UI, local helper, patched exporter,
-  selected-item polling, owner-only runtime state.
-- custom_components/retrace/: native integration, config/reauth flows,
-  coordinator, trackers, timestamps, Repairs and sanitized diagnostics.
-- tests/: isolated transport, security, recovery and polling tests.
-- docs/SECURITY.md: trust boundaries, storage and remaining review.
-- docs/RELEASE.md: install/compare checklist and community-release gates.
+Stable starts with its own sessions, item selections, entities and history.
+**Edge entities stay Edge and are disposable development data.** There is no
+history/credential migration or automatic deletion of Edge.
 
-## Install and update through Home Assistant
+For development add `https://github.com/hmmferreira/retrace#edge` and install
+**Retrace Edge**. Stable is updated deliberately through versioned releases;
+Edge remains separate. Both app instances use one companion integration package
+in Core, so incompatible integration-code testing needs a separate HA test instance.
 
-Add the [Edge app repository](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fhmmferreira%2Fretrace%23edge), then install **Retrace Edge**.
-Updates appear in Settings → Apps. No terminal archive copying is needed.
-The initial source build can take a while; subsequent builds reuse cached layers.
+## Distribution and licensing
 
-Edge delivery is explicit after tests on main; source pushes do not overwrite
-the installed Shared Edge evaluation package. Stable is reserved for manually promoted,
-validated releases at `https://github.com/hmmferreira/retrace#stable`.
-Do not add stable until its first release has passed live validation.
-Both channels remain experimental until the security/release checks are complete.
+Retrace is independent of Apple. The release uses an unofficial macOS signing
+provider. After explicit local consent, it downloads pinned CoreADI bytes directly
+from Apple and runs them in a restricted worker. Apple's EA1510 terms apply;
+permission for extracting/emulating that component on Linux has not been
+established by this project. The maintainer authorized publication with that
+uncertainty disclosed. Publication is not legal clearance, Apple endorsement,
+or a grant of third-party rights. See the [licensing review](docs/reviews/NATIVE_LICENSE_REVIEW_2026-11-22.md).
 
-The native integration is separate from the app. HACS can install it as a custom
-Integration repository; enable prerelease versions for Edge integration updates. Stable integration
-releases are published only on explicit stable promotion.
-See [channel delivery and migration](docs/CHANNELS.md).
+Project-authored code is MIT licensed. FindMy.py retains Copyright (c) 2023
+FindMy.py Contributors and its MIT notice. Retained Mac-engine source and Unicorn
+native components have GPL/LGPL obligations; the project MIT license does not
+replace them. Source pins, component notices, installed-package inventory and SBOM
+are retained in the repository/image. See [third-party notices](docs/THIRD_PARTY_NOTICES.md).
 
-## Usability update (0.1.3)
+## Supported scope and limits
 
-Setup explains location access versus item-key discovery. Discovery reuses its
-saved session and accepts email/password together on first sign-in. Item choices
-show exact save feedback, and each tracked item has an asynchronous refresh
-button. Manual refresh uses a one-minute anti-spam guard and always respects
-Apple's rate-limit pause. New Edge native entities have explicit Edge labels
-and channel-marked IDs. The app map is an optional preview; use HA's native
-map and tracker history for daily use. See [the implemented behavior and native
-UI direction](docs/USABILITY.md).
+amd64 Home Assistant OS/Supervised; minimum tested Core 2026.9.3 and Supervisor
+2026.11.0+. HA Container without Supervisor is not supported by this app package.
+Sparse reports are not continuous GPS. Manual refresh cannot force an AirTag to
+report. Battery level, street address and historical backfill are unavailable.
+Recorder controls history retention. Apple compatibility can change; longevity,
+expiry and additional recovery scenarios remain ongoing field validation.
 
-Finish an active import before updating the app. Update the companion through
-HACS and restart Core for the new native naming before confirming discovery.
-
-## Identifying items
-
-The chooser and item cards show secondary text with the original Apple name,
-model name/code, pairing date and a short app ID. Existing cached items are
-enriched during upgrade; no new sign-in or key rewrite is needed. Development
-installations use Edge consistently. Existing registry IDs are retained.
-See [known limitations and release readiness](docs/KNOWN_LIMITATIONS.md).
+Encrypted tokens and item keys stay private, but root, compromised parent code or
+a decrypted full backup can expose them. This is not an independently security-
+audited product. Protect backups and do not expose the internal API publicly.
+App cold backups pause tracking briefly for consistent state capture.
 
 ## Development
-Build from the retrace directory using its Dockerfile. It compiles the pinned
-exporter with the known protocol/session fixes and bundles the anisette helper
-locally; no public anisette service is used. Leaflet 1.9.4 is vendored with license
-and hashes; scripts do not load from a CDN. Maps fetch OpenStreetMap tiles.
 
-The local Portainer helper runs python tools/docker-check.py test or build.
-Set PORTAINER_DOCKER_API and PORTAINER_KEY_FILE for another environment.
-It is developer tooling, not part of the app. Tests have no network or live
-runtime mounts. Do not copy production sessions into test fixtures.
+The supported source-build runtime uses `retrace/Dockerfile.shared`; channel
+rendering selects it explicitly. Legacy Dockerfile/exporter code remains for
+historical development, not the Stable runtime. Device requests use bounded async
+workers; native execution is restricted and account HTTP destinations are controlled.
+Never put household credentials, sessions, raw exports or locations into Git/tests.
 
-## Attribution
-
-FindMy.py retains **Copyright (c) 2023 FindMy.py Contributors** under MIT.
-See [third-party notices](docs/THIRD_PARTY_NOTICES.md) for the complete license
-and packaged notice locations; this does not clear other component release gates.
+Run `python3 tools/docker-check.py test --non-root` with the local Portainer helper,
+then the relevant protocol/isolation checks. Release tags run app/native/hassfest
+checks before publishing the Stable repository and matching GitHub release.
+See [release policy](docs/RELEASE.md), [dependency boundary](docs/DEPENDENCY_BOUNDARY.md)
+and [contributor instructions](AGENTS.md).
 
 ## Buy me a coffee
 
-Enjoying Retrace? [Buy me a coffee](https://buymeacoffee.com/hmmferreira) to
-optionally support its development and maintenance. Retrace remains free, with
-all features available to everyone. Support goes to this project's maintainer;
-upstream contributors retain their credits and licenses.
-
-
-## License scope and release review
-
-Retrace-authored code is MIT licensed. Retained macOS engine source is GPLv2;
-Unicorn's native engine includes GPL/LGPL components, regardless of its Python
-wheel's BSD classifier. Component notices and source provenance remain separate
-under app/licenses and docs/THIRD_PARTY_NOTICES.md. The project license grants no
-rights over Apple's native component. See
-[the current release review](docs/reviews/NATIVE_LICENSE_REVIEW_2026-11-22.md).
-A source review archive is not an approved Stable installer. Stable starts fresh;
-Edge data/entities/history are never migrated into it.
+Enjoying Retrace? [Buy me a coffee](https://buymeacoffee.com/hmmferreira).

@@ -1,9 +1,13 @@
 # Release readiness and stable operation
 
-Current assessment after the owner macOS provider test, 2026-11-21. Historical
-reviews describe earlier stages; use this checklist with MAC_SIGNER_REVIEW.md.
-There is no approved shared-runtime stable release yet. The workflow and renderer
-intentionally reject that promotion until these gates are satisfied.
+## Maintainer decision — 2026-11-22
+
+The maintainer explicitly requested first official publication after the native
+license findings were disclosed. Version0.2.0 is authorized by release/0.2.0.json
+as source-build only, with unresolved Apple permission disclosed and explicit local
+operational consent before native acquisition. This does not approve native rights,
+waive terms or turn a checksum into legal clearance. Private evaluation stays off
+by default. Apple binaries are not included in Git, app packages or public images.
 
 ## Verified for the current Edge candidate
 
@@ -32,24 +36,21 @@ scenarios will continue to be tested as the product is used. Extended soak testi
 is not an open-ended first-release gate. Automated security/storage/isolation
 regressions remain required, and incomplete scenarios must be described honestly.
 
-## Remaining gates for the first release
+## Versioned publication controls
 
-1. **Security, provenance and licensing of the actual shared runtime.** Resolve
-   the Apple native-component permission question; complete the protocol/emulator
-   and transitive notices/source inventory and fix material security findings.
-   The legacy Rust exporter is absent from this runtime and is not its gate.
-   Separate local binary acquisition is not itself public-release permission.
-   See reviews/NATIVE_LICENSE_REVIEW_2026-11-22.md for concrete findings.
-2. **Stable packaging and publication.** Prepare a versioned source-build shared
-   runtime and a matching released companion integration, with immutable base/
-   source/version references and deliberate stable updates. Keep the existing
-   stable publication gate closed while item1 is unresolved; a review archive is
-   not an approved installer. Never enable private evaluation by default to
-   disguise clearance of the Apple component.
-3. **Channel separation.** Verify Stable and Edge repository URLs give distinct
-   app/data/instance IDs and entity IDs. Stable setup is a new protected login and
-   item selection. Edge entities/history remain Edge. There is no migration or
-   promise of history continuity between channels.
+1. App/native/hassfest checks and a fresh networkless stable-image smoke must pass.
+2. The renderer requires a version-specific maintainer authorization record.
+3. Immutable release tags select the shared stable runtime and require matching
+   source/package versions and release notes. Existing stable versions are never
+   overwritten. Publishing the source does not establish Apple permission.
+4. Fresh Stable uses only macOS by default, keeps private evaluation disabled and
+   cannot acquire/provision a native machine until the user consents in protected
+   Setup. Edge data, keys, selections and history are never imported.
+
+The earlier review record remains as evidence of unresolved legal questions,
+not an up-to-date statement that the maintainer has withheld publication approval.
+The owner elected to proceed with those limitations disclosed. Extended field
+reliability/recovery remains post-release work, with no false completed-audit claim.
 
 ## Companion integration boundary
 

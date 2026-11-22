@@ -24,10 +24,13 @@ class RuntimeBlocked(RuntimeError):
 def read_options(path=Path('/data/options.json')):
     path=Path(path)
     try:
-        if not path.exists():return {"runtime_mode":"legacy","shared_artifact_id":"applemusic-arm64-v8a","create_new_identity":False,"install_reviewed_component":False,"private_evaluation":False,"experimental_macos_signer":False}
+        if not path.exists():return {"runtime_mode":"legacy","shared_artifact_id":"applemusic-arm64-v8a","create_new_identity":False,"install_reviewed_component":False,"private_evaluation":False,"experimental_macos_signer":False,"apple_music_provider":True,"macos_provider":False}
         if path.is_symlink() or path.stat().st_size>4096:raise ValueError()
         value=json.loads(path.read_text(),object_pairs_hook=_pairs)
-        if not isinstance(value,dict) or set(value)-{"runtime_mode","shared_artifact_id","create_new_identity","install_reviewed_component","private_evaluation","experimental_macos_signer"}:raise ValueError()
+        if not isinstance(value,dict) or set(value)-{"runtime_mode","shared_artifact_id","create_new_identity","install_reviewed_component","private_evaluation","experimental_macos_signer","apple_music_provider","macos_provider"}:raise ValueError()
+        apple=value.get('apple_music_provider',True)
+        mac=value.get('macos_provider',False)
+        if type(apple) is not bool or type(mac) is not bool:raise ValueError()
         macos=value.get("experimental_macos_signer",False)
         if type(macos) is not bool:raise ValueError()
         mode=value.get("runtime_mode","legacy")
@@ -37,7 +40,7 @@ def read_options(path=Path('/data/options.json')):
         private_evaluation=value.get("private_evaluation",False)
         if mode not in ("legacy","shared") or type(create) is not bool or type(install) is not bool or type(private_evaluation) is not bool:raise ValueError()
         if not isinstance(artifact,str) or not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,79}",artifact):raise ValueError()
-        return {"runtime_mode":mode,"shared_artifact_id":artifact,"create_new_identity":create,"install_reviewed_component":install,"private_evaluation":private_evaluation,"experimental_macos_signer":macos}
+        return {"runtime_mode":mode,"shared_artifact_id":artifact,"create_new_identity":create,"install_reviewed_component":install,"private_evaluation":private_evaluation,"experimental_macos_signer":macos,"apple_music_provider":apple,"macos_provider":mac}
     except Exception:raise RuntimeBlocked("runtime_options_invalid") from None
 
 def publish_runtime_options(root,options,*,uid=None,gid=None):
@@ -170,30 +173,35 @@ async def compose_runtime(store,options):
     from .offline_signer import provider_for
     from .owned_protocol import create_account
     from .shared_ui import compose_shared_ui
-    policy=reviewed_artifact(options['shared_artifact_id'],private_evaluation=options.get('private_evaluation',False))
-    # Validate the actual target's native boundary before vendor download,
-    # entering credentials, or opening UI/integration listeners.
     await verify_native_boundary()
+    apple_enabled=options.get('apple_music_provider',True)
+    policy=signing=sessions=None
     library=store.root/'owned-libs.bin'
-    if options.get('install_reviewed_component',False):
-        from .component_installer import ensure_component
-        await ensure_component(store.root,policy,install=True)
-    await verify_artifact(library,policy)
-    signing=SigningIdentityStore(store.root,policy.expected_sha256)
-    check=await check_saved_identity(signing,library,policy.expected_sha256)
-    print("Retrace identity check: "+json.dumps(check,separators=(",",":")),flush=True)
-    sessions=PrivateSessionStore(store.root,library=library,expected_sha256=policy.expected_sha256)
+    if apple_enabled:
+        policy=reviewed_artifact(options['shared_artifact_id'],private_evaluation=options.get('private_evaluation',False))
+        # Validate the actual target's native boundary before vendor download,
+        # entering credentials, or opening UI/integration listeners.
+        library=store.root/'owned-libs.bin'
+        if options.get('install_reviewed_component',False):
+            from .component_installer import ensure_component
+            await ensure_component(store.root,policy,install=True)
+        await verify_artifact(library,policy)
+        signing=SigningIdentityStore(store.root,policy.expected_sha256)
+        check=await check_saved_identity(signing,library,policy.expected_sha256)
+        print("Retrace identity check: "+json.dumps(check,separators=(",",":")),flush=True)
+        sessions=PrivateSessionStore(store.root,library=library,expected_sha256=policy.expected_sha256)
     mac=None
-    if options.get('experimental_macos_signer',False):
+    if options.get('experimental_macos_signer',False) or options.get('macos_provider',False):
         from .macos_runtime import MacRuntime
         mac=MacRuntime(store.root,options)
         await mac.prepare()
     lifecycle=asyncio.Lock()
-    async def account_factory(provider=None):
+    async def account_factory(provider=None,*,native_consent=False):
+        provider=provider or ('apple_music' if apple_enabled else 'macos')
         if provider=='macos':
             if mac is None:raise RuntimeBlocked('macos_signer_not_available')
-            return await mac.account()
-        if provider not in (None,'apple_music'):raise RuntimeBlocked('runtime_options_invalid')
+            return await mac.account(native_consent=native_consent)
+        if provider!='apple_music' or not apple_enabled:raise RuntimeBlocked('provider_unavailable')
         async with lifecycle:
             if signing.exists():state,serial,identity,ids=await asyncio.to_thread(signing.load)
             else:
@@ -238,5 +246,8 @@ async def compose_runtime(store,options):
     result=compose_shared_ui(store,account_factory=account_factory,session_writer=save_account,
                              session_available=available)
     result[1].macos_available=mac is not None
-    print("Retrace providers: "+json.dumps({"apple_music":True,"macos":mac is not None},separators=(",",":")),flush=True)
+    result[1].apple_music_available=apple_enabled
+    result[1].default_provider='apple_music' if apple_enabled else 'macos'
+    result[1].native_consent_required=mac.consent_required if mac is not None else lambda:False
+    print("Retrace providers: "+json.dumps({"apple_music":apple_enabled,"macos":mac is not None},separators=(",",":")),flush=True)
     return result

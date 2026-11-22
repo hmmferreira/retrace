@@ -1,4 +1,5 @@
 "use strict";
+let providerTouched=false;
 let csrf="", snapshot=null, loginMethod=null, busy=false, selectionDirty=false;
 let forceDiscoveryLogin=false, reconnecting=false, recoveryKey="", map=null, markers=null;
 let refreshing=false, emailHint="", authKey="", factorKey="", factorPhase="idle", layoutShared=null, activeFeedback=null;
@@ -165,12 +166,17 @@ function render(data){
   const shared=Boolean(data.setup?.shared_auth);
   configureLayout(shared);
   $("provider-controls").hidden=!shared;
-  $("provider-current").textContent="Current connection provider: "+(data.setup?.authentication_provider==="macos"?"macOS":"Apple Music");
+  const providerSelect=$("authentication-provider");
+  if(!providerTouched&&data.setup?.default_authentication_provider)providerSelect.value=data.setup.default_authentication_provider;
+  providerSelect.querySelector('option[value="apple_music"]').disabled=data.setup?.authentication_providers?.find(p=>p.id==="apple_music")?.available===false;
+  configureNativeConsent(data);
+  $("provider-current").textContent=data.setup?.locations_connected?"Current connection provider: "+(data.setup?.authentication_provider==="macos"?"macOS":"Apple Music"):"No saved connection yet";
   const macAvailable=Boolean(data.setup?.authentication_providers?.find(p=>p.id==="macos")?.available);
   const macOption=$("authentication-provider").querySelector('option[value="macos"]');
   macOption.disabled=!macAvailable;
-  macOption.textContent=macAvailable?"macOS provider (experimental)":"macOS provider (experimental — unavailable)";
+  macOption.textContent=macAvailable?(data.channel==="stable"?"macOS provider":"macOS provider (experimental)"):"macOS provider (unavailable)";
   $("provider-help").textContent=macAvailable?"Both use your Apple account and Apple verification. Switching provider creates a separate device identity and needs a new sign-in; the previous provider's saved connection is kept. No automatic fallback.":"Both providers use your Apple account and Apple verification. The experimental macOS provider is not enabled in this build. Your current connection is kept.";
+  if(data.channel==='stable')$("provider-help").textContent="This release uses the macOS provider. Apple Music remains available in Edge for development.";
   const providerPending=["working","choose_method","verification_code"].includes(data.auth?.phase);
   $("authentication-provider").disabled=providerPending;
   const connected=Boolean(data.setup?.locations_connected);
@@ -249,18 +255,27 @@ function renderMap(){
 async function refresh(){if(refreshing)return;refreshing=true;try{render(await api("v1/snapshot"));}catch(error){$("health").textContent="App unavailable";statusBadge("checks-badge","Checks: app unavailable","error");notice(error.message,"error");}finally{refreshing=false;}}
 document.querySelectorAll("[data-tab]").forEach(button=>button.onclick=()=>{setFeedback("message","");for(const id of ["overview","setup"])$(id).hidden=id!==button.dataset.tab;document.querySelectorAll("[data-tab]").forEach(other=>other.setAttribute("aria-selected",String(other===button)));renderMap();});
 $("map-preview").ontoggle=renderMap;
+function configureNativeConsent(data){
+  const required=Boolean(data?.setup?.shared_auth&&data.setup.native_component_consent_required&&$("authentication-provider").value==="macos");
+  $("native-component-notice").hidden=!required;
+  $("native-component-consent").required=required;
+}
+$("authentication-provider").onchange=()=>{providerTouched=true;configureNativeConsent(snapshot);};
 $("login").onsubmit=event=>{
   event.preventDefault();if(busy)return;
   if(!snapshot||!csrf){notice("Account status is still loading. Try again shortly.","info","login-status");return;}
   if(snapshot?.setup?.shared_auth&&!$("consent").checked){
     notice("Allow encrypted item-key recovery before connecting your Apple account.","error","login-status");$("consent").focus();return;
   }
+  if(snapshot?.setup?.native_component_consent_required&&$("authentication-provider").value==="macos"&&!$("native-component-consent").checked){
+    notice("Review the Apple component notice and allow local acquisition before connecting.","error","login-status");$("native-component-consent").focus();return;
+  }
   const form=event.target;
   if(!form.checkValidity()){notice("Enter your Apple account email and password before connecting.","error","login-status");form.reportValidity();return;}
   const email=form.elements.namedItem("email").value,password=form.elements.namedItem("password").value;
   emailHint=email;$("discovery-email").value=email;
   form.elements.namedItem("password").value="";
-  action(async()=>showFactor(await api("ui/login",{email,password,...(snapshot?.setup?.shared_auth?{discovery_consent:true,provider:$("authentication-provider").value}:{})})),"Connecting your Apple account…",null,"login-status");
+  action(async()=>showFactor(await api("ui/login",{email,password,...(snapshot?.setup?.shared_auth?{discovery_consent:true,provider:$("authentication-provider").value,native_component_consent:$("native-component-consent").checked}:{})})),"Connecting your Apple account…",null,"login-status");
 };
 function showFactor(result){
   result=result||{phase:"idle"};authKey=JSON.stringify(result);

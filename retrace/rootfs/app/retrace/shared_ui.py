@@ -125,8 +125,8 @@ def compose_shared_ui(store, *, account_factory, session_writer, session_availab
     from .apple_transport import OwnedHttpSession
     if not all(callable(value) for value in (account_factory,session_writer,session_available)):
         raise ValueError("reviewed_account_lifecycle_required")
-    async def checked_factory(provider=None):
-        account=await account_factory(provider) if provider is not None else await account_factory()
+    async def checked_factory(provider=None,*,native_consent=False):
+        account=await account_factory(provider,**({"native_consent":True} if native_consent else {})) if provider is not None else await account_factory()
         transport=getattr(account,"_http",None)
         if not isinstance(transport,OwnedHttpSession) or transport.profile!="account":
             if account is not None:

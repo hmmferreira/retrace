@@ -1,5 +1,5 @@
 name: Retrace (experimental)
-version: 0.1.14
+version: 0.2.0
 slug: retrace
 description: Location history in Home Assistant with Apple Find My support
 url: https://github.com/hmmferreira/retrace
@@ -27,6 +27,8 @@ options:
   install_reviewed_component: false
   private_evaluation: false
   experimental_macos_signer: false
+  apple_music_provider: true
+  macos_provider: false
 schema:
   runtime_mode: list(legacy|shared)
   shared_artifact_id: str
@@ -34,5 +36,7 @@ schema:
   install_reviewed_component: bool
   private_evaluation: bool
   experimental_macos_signer: bool
+  apple_music_provider: bool
+  macos_provider: bool
 backup: cold
 stage: experimental

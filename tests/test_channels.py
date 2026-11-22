@@ -39,6 +39,25 @@ class ChannelTests(unittest.TestCase):
             self.assertIn("stage: experimental",(target/"retrace/config.yaml").read_text())
             self.assertEqual(json.loads((target/"CHANNEL.json").read_text())["channel"],"stable")
 
+    def test_authorized_stable_is_fresh_mac_source_build_without_private_evaluation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            target=Path(tmp)/'stable'
+            module.render(ROOT,target,'stable','0.2.0',runtime='shared')
+            config=(target/'retrace/config.yaml').read_text()
+            self.assertIn('stage: stable',config)
+            self.assertIn('  runtime_mode: shared',config)
+            self.assertIn('  apple_music_provider: false',config)
+            self.assertIn('  macos_provider: true',config)
+            self.assertIn('  private_evaluation: false',config)
+            self.assertIn('  create_new_identity: true',config)
+            self.assertIn('boot: auto',config)
+            self.assertEqual(json.loads((target/'retrace/rootfs/app/retrace/channel.json').read_text())['channel'],'stable')
+            policy=json.loads((target/'RELEASE_POLICY.json').read_text())
+            self.assertEqual(policy['apple_native_permission'],'unresolved-disclosed')
+            self.assertFalse(policy['history_migration'])
+            self.assertFalse(list(target.rglob('*.bin')))
+            self.assertFalse(list(target.rglob('*.enc')))
+
     def test_shared_edge_renderer_selects_shared_dockerfile_and_explicit_mode(self):
         with tempfile.TemporaryDirectory() as tmp:
             target=Path(tmp)/"shared-edge"

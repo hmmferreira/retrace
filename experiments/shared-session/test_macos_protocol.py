@@ -42,6 +42,24 @@ class MacProtocolTests(unittest.IsolatedAsyncioTestCase):
                 self.assertIsNone(restored._password)
                 self.assertNotIn('idms_pet',restored._login_state_data)
                 self.assertEqual(restored._http.profile,'account')
+                # A Stable session can restore with local consent and no evaluation flag.
+                from retrace.private_session_store import PrivateSessionStore,restore_reporting_account
+                from retrace.native_consent import record
+                from retrace.storage import atomic_json
+                import os
+                parent=Path(tmp)/'fresh-stable';macroot=parent/'providers'/'macos';macroot.mkdir(parents=True,mode=0o700)
+                record(macroot)
+                store=PrivateSessionStore(macroot,library=macroot/'coreadi.bin',expected_sha256=LIBRARY_SHA)
+                with patch('retrace.private_session_store.time.time',return_value=1000):await store.save(account)
+                atomic_json(parent/'active-provider.json',{'version':1,'provider':'macos'})
+                with patch.dict(os.environ,{'RETRACE_RUNTIME_MODE':'shared','RETRACE_PRIVATE_EVALUATION':'0'}),patch('retrace.owned_session.time.time',return_value=1001):
+                    stable=await restore_reporting_account(parent)
+                try:
+                    self.assertEqual(stable._devid,machine['devid'])
+                    self.assertEqual(stable.device_uuid,account.device_uuid)
+                    self.assertIsNone(stable._password)
+                finally:await stable.close()
+
             finally:
                 await account.close()
                 if restored:await restored.close()

@@ -126,7 +126,8 @@ async def restore_reporting_account(root,*,_mac=False):
     if _mac:
         from .macos_artifact import LIBRARY_SHA
         from .macos_worker import MacSigner
-        if os.environ.get('RETRACE_PRIVATE_EVALUATION')!='1' or policy.library!='coreadi.bin' or policy.digest!=LIBRARY_SHA:
+        from .native_consent import accepted
+        if (os.environ.get('RETRACE_PRIVATE_EVALUATION')!='1' and not await asyncio.to_thread(accepted,root)) or policy.library!='coreadi.bin' or policy.digest!=LIBRARY_SHA:
             raise SessionBlocked('session_artifact_mismatch')
         options['signer_factory']=MacSigner
     elif os.environ.get("RETRACE_RUNTIME_MODE")=="shared":

@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "version": "0.2.0",
+  "channel": "stable",
+  "maintainer_release_authorized": true,
+  "authorization_date": "2026-11-22",
+  "distribution": "source-build-only",
+  "apple_native_permission": "unresolved-disclosed",
+  "apple_binaries_in_package": false,
+  "local_native_consent_required": true,
+  "history_migration": false,
+  "default_provider": "macos",
+  "security_review": "docs/reviews/NATIVE_LICENSE_REVIEW_2026-11-22.md"
+}

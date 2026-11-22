@@ -20,3 +20,5 @@
 **/signer.lock
 
 **/store.lock
+
+**/native-consent.json

@@ -26,3 +26,5 @@ active-provider.json
 signer.lock
 
 store.lock
+
+native-consent.json

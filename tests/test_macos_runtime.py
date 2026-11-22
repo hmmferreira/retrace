@@ -32,7 +32,8 @@ class MacRuntimeTests(unittest.IsolatedAsyncioTestCase):
     async def test_corrupt_mac_machine_cannot_trigger_reprovisioning(self):
         self.runtime.machine_store.save(self.machine)
         (self.runtime.root/'machine.json').write_text('{}')
-        with patch('retrace.macos_runtime.provision',new_callable=AsyncMock) as provision:
+        self.runtime.options['private_evaluation']=True
+        with patch('retrace.macos_runtime.ensure',new_callable=AsyncMock),patch('retrace.macos_runtime.provision',new_callable=AsyncMock) as provision:
             with self.assertRaises(Exception):await self.runtime.account()
             provision.assert_not_awaited()
     async def test_signers_serialize_state_and_reap_children(self):

@@ -2,6 +2,7 @@ name: Validate and deliver channels
 on:
   push:
     branches: [main]
+    tags: ["v[0-9]*"]
   pull_request:
   workflow_dispatch:
     inputs:
@@ -11,7 +12,7 @@ on:
         options: [edge, stable]
         default: edge
       stable_verified:
-        description: Stable passed the documented real-account and security release checks
+        description: Maintainer authorizes the source-only release and disclosed limitations
         type: boolean
         default: false
 permissions:
@@ -53,9 +54,28 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
       - name: Validate integration with pinned official hassfest image
         run: docker run --rm -v "$PWD:/github/workspace" ghcr.io/home-assistant/hassfest@sha256:b200bb178c5c62f984c2c705c820bd991e5308d6cba6987d24c7d643919ab5cc
+  stable_image:
+    if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.channel == 'stable')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Build and probe fresh stable without network or Apple component
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION=$(sed -n 's/^version: *//p' retrace/config.yaml)
+          python tools/render-channel.py stable "$VERSION" "$RUNNER_TEMP/stable-test" --runtime shared
+          docker build -t retrace-stable-check "$RUNNER_TEMP/stable-test/retrace"
+          docker run --rm --network none --read-only --user 1000:1000 --cap-drop ALL \
+            --security-opt no-new-privileges:true \
+            --tmpfs /data:rw,nosuid,mode=1777,size=64m --tmpfs /tmp:rw,nosuid,size=32m \
+            -v "$PWD/tools/stable-startup-smoke.py:/smoke.py:ro" retrace-stable-check python /smoke.py
   deliver:
-    needs: [test, native, hassfest]
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    needs: [test, native, hassfest, stable_image]
+    if: always() && needs.test.result == 'success' && needs.native.result == 'success' && needs.hassfest.result == 'success' && (needs.stable_image.result == 'success' || (github.event_name == 'workflow_dispatch' && inputs.channel == 'edge')) && ((github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')))
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -65,12 +85,12 @@ jobs:
           fetch-depth: 0
       - name: Render selected channel
         env:
-          REQUESTED_CHANNEL: ${{ inputs.channel || 'edge' }}
+          REQUESTED_CHANNEL: ${{ startsWith(github.ref, 'refs/tags/v') && 'stable' || inputs.channel || 'edge' }}
           STABLE_VERIFIED: ${{ inputs.stable_verified }}
         shell: bash
         run: |
           set -euo pipefail
-          if [ "$REQUESTED_CHANNEL" = stable ] && [ "$STABLE_VERIFIED" != true ]; then
+          if [ "$REQUESTED_CHANNEL" = stable ] && [ "$STABLE_VERIFIED" != true ] && [[ "$GITHUB_REF" != refs/tags/v* ]]; then
             echo 'Stable requires the documented live validation.' >&2
             exit 1
           fi
@@ -81,8 +101,11 @@ jobs:
           if [ "$REQUESTED_CHANNEL" = edge ]; then
             python tools/render-channel.py edge "$VERSION" "$RUNNER_TEMP/channel-tree" --runtime shared
           else
-            echo 'Stable runtime promotion remains blocked pending the release review.' >&2
-            exit 1
+            if [[ "$GITHUB_REF" == refs/tags/v* ]] && [ "${GITHUB_REF#refs/tags/v}" != "$VERSION" ]; then
+              echo 'Release tag and source version differ.' >&2
+              exit 1
+            fi
+            python tools/render-channel.py stable "$VERSION" "$RUNNER_TEMP/channel-tree" --runtime shared
           fi
           echo "CHANNEL=$REQUESTED_CHANNEL" >> "$GITHUB_ENV"
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
@@ -115,7 +138,15 @@ jobs:
           set -euo pipefail
           FLAGS=()
           if [ "$CHANNEL" = edge ]; then FLAGS+=(--prerelease); fi
+          if [ ! -f "$GITHUB_WORKSPACE/docs/releases/$VERSION.md" ]; then
+            if [ "$CHANNEL" = stable ]; then
+              echo 'Stable release notes are required.' >&2
+              exit 1
+            fi
+            mkdir -p "$GITHUB_WORKSPACE/docs/releases"
+            printf '%s\n' "Retrace Edge development build. Source-build only; see docs/SECURITY.md and docs/RELEASE.md." > "$GITHUB_WORKSPACE/docs/releases/$VERSION.md"
+          fi
           gh release create "v$VERSION" --target "$(git rev-parse HEAD)" \
             --title "Retrace $CHANNEL $VERSION" \
-            --notes "Tested source and companion integration. App repository: https://github.com/$GH_REPO#$CHANNEL. Experimental: review docs/SECURITY.md and docs/RELEASE.md. No public container binary is included." \
+            --notes-file "$GITHUB_WORKSPACE/docs/releases/$VERSION.md" \
             "${FLAGS[@]}"

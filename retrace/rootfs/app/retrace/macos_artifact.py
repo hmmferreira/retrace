@@ -45,8 +45,8 @@ def extract(payload):
         raise TransportBlocked('artifact_digest_mismatch')
     return slices[0]
 
-async def ensure(path,*,private_evaluation=False):
-    if private_evaluation is not True:raise TransportBlocked('artifact_review_required')
+async def ensure(path,*,private_evaluation=False,local_consent=False):
+    if private_evaluation is not True and local_consent is not True:raise TransportBlocked('native_consent_required')
     if path.exists() or path.is_symlink():
         value=await asyncio.to_thread(_private_bytes,path,16*1024*1024)
         if hashlib.sha256(value).hexdigest()!=LIBRARY_SHA:raise TransportBlocked('artifact_digest_mismatch')

@@ -8,14 +8,14 @@ files into the edge branch. Source pushes never overwrite the side-by-side Share
 Edge package; use the reviewed evaluation renderer for that app. Versions are unique (`0.1.2-dev.RUN.ATTEMPT`), never a mutable `latest`.
 App store URL: https://github.com/hmmferreira/retrace#edge
 
-Stable URL (after the first validated promotion):
+Stable release repository:
 https://github.com/hmmferreira/retrace#stable
-Run the channel workflow on main, choose stable, and acknowledge completion of
-RELEASE.md checks. Stable versions cannot be overwritten: increase config.yaml's
+Push the versioned maintainer release tag after the release checks, or run the
+channel workflow on main with explicit publication authorization. Stable versions cannot be overwritten: increase config.yaml's
 version first. Stable is not automatically promoted from Edge. Matching tagged integration
 releases are created only after the channel branch is successfully pushed.
 
-These are source-build channels for now. Home Assistant builds on Install/Update;
+Both channels are source-build only. Home Assistant builds on Install/Update;
 users do not copy source files themselves. Prebuilt public images are deliberately
 not published while exporter/dependency redistribution rights are unresolved.
 Once cleared, publish a tested immutable GHCR version FIRST, make the package
@@ -93,3 +93,13 @@ its own entities/history. Keep companion integration code on a compatible releas
 version for everyday use; app channel separation alone does not provide separate
 Core integration code versions. Preparing a release never deletes the working
 Edge setup implicitly. Extended soak/recovery observation continues after release.
+
+
+## Official0.2.0 publication
+
+A maintainer-pushed immutable `v0.2.0` source tag triggers the release workflow.
+App/native/hassfest and fresh Stable image checks run before the `stable` branch
+and matching GitHub/HACS release are published. `release/0.2.0.json` records the
+informed source-only publication decision; native permission remains unresolved
+and is disclosed in release notes. Stable defaults to macOS, with private evaluation
+off and explicit local acquisition consent. No manual package copying is needed.

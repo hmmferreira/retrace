@@ -1,3 +1,8 @@
+> Release0.2.0: the maintainer authorized source-only publication with unresolved
+> Apple permission disclosed and local native acquisition consent required. See
+> RELEASE.md and release/0.2.0.json. Earlier statements that publication itself is
+> blocked describe the pre-decision review; they do not mean native rights are cleared.
+
 # Dependency and ownership boundary
 
 Source audit: 2026-11-20, development branch `feat/shared-session-discovery`.

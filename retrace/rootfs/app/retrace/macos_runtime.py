@@ -59,15 +59,27 @@ class MacRuntime:
         self.parent=root;self.root=root/'providers'/'macos';self.library=self.root/'coreadi.bin'
         self.options=options;self.machine_store=MachineStore(self.root);self.lock=asyncio.Lock()
         self.sessions=PrivateSessionStore(self.root,library=self.library,expected_sha256=LIBRARY_SHA)
-    async def prepare(self):
+    def consent_required(self):
+        from .native_consent import accepted
+        return not self.options.get('private_evaluation',False) and not accepted(self.root)
+    async def prepare(self,*,native_consent=False):
         # The operator flag permits only artifact acquisition. Account UI consent
         # remains required before the lazy first provisioning exchange.
         for root in (self.parent/'providers',self.root):
             if root.is_symlink():raise ProvisioningBlocked('session_storage_invalid')
             root.mkdir(mode=0o700,exist_ok=True);root.chmod(0o700)
-        await ensure(self.library,private_evaluation=self.options.get('private_evaluation',False))
-    async def account(self):
+        from .native_consent import accepted,record
+        if native_consent is True:
+            from .shared_runtime import _persist
+            await _persist(lambda:record(self.root))
+        consent=await asyncio.to_thread(accepted,self.root)
+        evaluation=self.options.get('private_evaluation',False)
+        if evaluation or consent:
+            await ensure(self.library,private_evaluation=evaluation,local_consent=consent)
+    async def account(self,*,native_consent=False):
         async with self.lock:
+            await self.prepare(native_consent=native_consent)
+            if self.consent_required():raise ProvisioningBlocked('native_consent_required')
             if self.machine_store.exists():machine=await asyncio.to_thread(self.machine_store.load)
             else:
                 if (self.root/MANIFEST).exists() or (self.root/MANIFEST).is_symlink():raise ProvisioningBlocked('signing_identity_missing')
