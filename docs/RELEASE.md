@@ -1,5 +1,24 @@
 # Release readiness and stable operation
 
+## Official 0.2.0 publication and installation — 2026-11-22
+
+Published non-prerelease tag v0.2.0 at source6b20785599a854c5cf73035a5c2d9054f0fc18c5;
+Stable delivery2064ed3. GitHub release workflow45023827562 completed successfully:
+app tests, native integration tests, hassfest and the fresh networkless Stable
+image probe all passed. Local validation passed308 app tests and877 SDK,
+17 controller and16 discovery/Mac cases, including consent-backed session restore.
+An independent protocol CI context omitted its Mac test file; main f34354a fixes
+that harness omission without changing the immutable release.
+
+Home Assistant installed and started415c704e_retrace0.2.0 from the Stable
+repository. MCP verified protection enabled, AppArmor profile, boot auto and
+GET /health200 ready. Defaults select macOS only, private evaluation false and
+explicit first-identity creation true. No account sign-in or provisioning was
+performed on behalf of the owner; readiness is not tracking readiness. Complete
+protected Web UI Setup, local component consent, Apple verification, item recovery
+and selection. Existing Edge2d630a37_retrace0.1.14-dev.1.6 remained started,
+protected and unchanged; no data/history/session migration occurred.
+
 ## Maintainer decision — 2026-11-22
 
 The maintainer explicitly requested first official publication after the native
