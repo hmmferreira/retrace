@@ -45,6 +45,7 @@ jobs:
           rm -rf "$RUNNER_TEMP/shared-context/backend/.git"
           cp tests/test_shared_discovery.py "$RUNNER_TEMP/shared-context/test_shared_discovery.py"
           cp experiments/shared-session/test_controller_protocol.py "$RUNNER_TEMP/shared-context/test_controller_protocol.py"
+          cp experiments/shared-session/test_macos_protocol.py "$RUNNER_TEMP/shared-context/test_macos_protocol.py"
           docker build --build-arg TEST_BASE_IMAGE=python:3.12-slim-bookworm -t shared-discovery-test "$RUNNER_TEMP/shared-context"
       - name: Offline protocol and controller tests
         run: docker run --rm --user 1000:1000 --network none --read-only --cap-drop ALL --security-opt no-new-privileges --tmpfs /tmp:rw,nosuid,size=256m shared-discovery-test
