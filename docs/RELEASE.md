@@ -20,37 +20,36 @@ intentionally reject that promotion until these gates are satisfied.
 - Shared image build, worker isolation and report-child smoke passed. Apple
   binaries and private state stay outside Git and published image contexts.
 
+## Owner's release scope — 2026-11-22
+
+Stable starts fresh: separate app data, sessions, entities and history. Edge is
+for development and may be discarded; its history must not be migrated to Stable.
+No cross-channel credential, item-state or entity-history migration is planned.
+Do not delete the current Edge installation as part of preparing a release.
+
+Real-world reliability, long-running session behavior and additional recovery
+scenarios will continue to be tested as the product is used. Extended soak testing
+is not an open-ended first-release gate. Automated security/storage/isolation
+regressions remain required, and incomplete scenarios must be described honestly.
+
 ## Remaining gates for the first release
 
-1. **Operational recovery on the installed app.** Observe unattended macOS polling,
-   deliberately restart the app and verify session reuse without login, verify
-   selected items and history remain intact, and finish expiry/reauthentication,
-   network interruption/backoff and recovery checks. Synthetic encryption/native
-   restoration is not proof of target-host Supervisor backup/restore. Sensitive
-   interactions remain in protected ingress. Keep the existing working installation
-   available throughout validation; do not delete it to prepare a release.
-2. **Security, provenance and licensing closure for the actual shared runtime.**
-   Finish the credential-path/transitive review and notices/source inventory for
-   FindMy.py, the GPL Mac engine/emulator and the Apple native component. Current
-   Apple component use is explicit private evaluation; separate local download
-   is not an established public-release clearance. The absent Rust exporter does
-   not block this runtime; it remains relevant only to legacy packaging. Fix any
-   material findings and document the precise supported scope and remaining risks.
-   Bound/clean retained encrypted machine generations safely and finish release
-   supply-chain metadata/advisory checks. No independent-security-audit claim.
-3. **Immutable stable delivery.** Package the shared runtime explicitly, choose a
-   versioned released macOS provider default after validation, and add the reviewed
-   stable workflow/renderer path with app/integration compatibility tests. Publish
-   a matching companion integration release and immutable source/version metadata.
-   Keep stable updates deliberate and Edge independent. Do not enable private
-   evaluation by default or remove the current stable gate to bypass item2.
-4. **Safe everyday/Edge coexistence and transition.** Stable and Edge repository
-   URLs produce separate app/data/instance IDs. Validate separate entities and
-   histories, one-time protected setup, a rollback procedure and the transition
-   from Edge without losing existing history. Cross-volume secret migration is
-   not implemented. A fresh stable installation has different entity identities;
-   old Recorder history is not automatically reassigned. Prefer keeping the old
-   entities/history intact until an explicit migration plan is verified.
+1. **Security, provenance and licensing of the actual shared runtime.** Resolve
+   the Apple native-component permission question; complete the protocol/emulator
+   and transitive notices/source inventory and fix material security findings.
+   The legacy Rust exporter is absent from this runtime and is not its gate.
+   Separate local binary acquisition is not itself public-release permission.
+   See reviews/NATIVE_LICENSE_REVIEW_2026-11-22.md for concrete findings.
+2. **Stable packaging and publication.** Prepare a versioned source-build shared
+   runtime and a matching released companion integration, with immutable base/
+   source/version references and deliberate stable updates. Keep the existing
+   stable publication gate closed while item1 is unresolved; a review archive is
+   not an approved installer. Never enable private evaluation by default to
+   disguise clearance of the Apple component.
+3. **Channel separation.** Verify Stable and Edge repository URLs give distinct
+   app/data/instance IDs and entity IDs. Stable setup is a new protected login and
+   item selection. Edge entities/history remain Edge. There is no migration or
+   promise of history continuity between channels.
 
 ## Companion integration boundary
 

@@ -19,3 +19,9 @@ parawanderer/os-findmy-e revision 595d39810639d750715babc30b063d4ac8f2c437 is
 included with complete GPL text and per-file hashes in /app/retrace/mac_engine.
 Retrace's MIT license does not replace that component's license. Apple native
 binaries are not included in this image and remain subject to their own terms.
+
+PYTHON_NOTICES.txt retains public notice files collected from installed Python
+distributions. Wheel metadata is not authoritative for embedded native components.
+In particular Unicorn's BSD classifier does not describe its GPL native engine;
+see unicorn-2.1.4/ for upstream GPL/LGPL notices, authors and source provenance.
+Public prebuilt binary delivery remains gated on the corresponding-source review.

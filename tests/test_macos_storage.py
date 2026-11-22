@@ -24,6 +24,28 @@ class MacStoreTests(unittest.TestCase):
             self.assertEqual(path.stat().st_mode&0o777,0o600)
             self.assertNotIn(b'synthetic-native-state',path.read_bytes())
         self.assertEqual(active_provider(self.root),'apple_music')
+    def test_retention_is_bounded_and_unrelated_provider_files_are_preserved(self):
+        self.store.save(self.machine)
+        other=self.store.root/'session-fixture.enc';other.write_bytes(b'unrelated session fixture')
+        for routing in range(10):self.store.save(dict(self.machine,routing=routing))
+        self.assertEqual(len(list(self.store.root.glob('machine-*.enc'))),3)
+        self.assertEqual(len(list(self.store.root.glob('machine-*.key'))),3)
+        self.assertEqual(self.store.load()['routing'],9)
+        self.assertEqual(other.read_bytes(),b'unrelated session fixture')
+
+    def test_concurrent_reads_survive_generation_cleanup(self):
+        from concurrent.futures import ThreadPoolExecutor
+        self.store.save(self.machine)
+        def write():
+            for routing in range(25):self.store.save(dict(self.machine,routing=routing))
+        def read():
+            for _ in range(100):self.assertIsInstance(self.store.load()['routing'],int)
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            writer=pool.submit(write);reader=pool.submit(read)
+            writer.result(timeout=10);reader.result(timeout=10)
+        self.assertEqual(self.store.load()['routing'],24)
+        self.assertEqual(len(list(self.store.root.glob('machine-*.enc'))),3)
+
     def test_failed_publish_preserves_old_generation(self):
         self.store.save(self.machine)
         changed=dict(self.machine,routing=77)

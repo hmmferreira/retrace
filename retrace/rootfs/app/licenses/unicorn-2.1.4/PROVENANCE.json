@@ -1,0 +1,27 @@
+{
+  "repository": "https://github.com/unicorn-engine/unicorn",
+  "revision": "8028ec436f2d9376525352dd38ed9ed6b9f6be10",
+  "tag": "2.1.4",
+  "files": [
+    {
+      "path": "COPYING",
+      "sha256": "6f04ae8364d0079a192b14635f4b1da294ce18724c034c39a6a41d1b09df6100"
+    },
+    {
+      "path": "COPYING.LGPL2",
+      "sha256": "b7993225104d90ddd8024fd838faf300bea5e83d91203eab98e29512acebd69c"
+    },
+    {
+      "path": "COPYING_GLIB",
+      "sha256": "d245807f90032872d1438d741ed21e2490e1175dc8aa3afa5ddb6c8e529b58e5"
+    },
+    {
+      "path": "AUTHORS.TXT",
+      "sha256": "6dff517f42f12f2c64d0864cc06a7d2a1cc10c7435a1167a49c625e60813f51c"
+    },
+    {
+      "path": "CREDITS.TXT",
+      "sha256": "ea18f463dee60f35024f5116f2c7fd553cb355fcf21843ac71e5406f0aa3279d"
+    }
+  ]
+}

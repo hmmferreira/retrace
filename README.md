@@ -112,3 +112,15 @@ Enjoying Retrace? [Buy me a coffee](https://buymeacoffee.com/hmmferreira) to
 optionally support its development and maintenance. Retrace remains free, with
 all features available to everyone. Support goes to this project's maintainer;
 upstream contributors retain their credits and licenses.
+
+
+## License scope and release review
+
+Retrace-authored code is MIT licensed. Retained macOS engine source is GPLv2;
+Unicorn's native engine includes GPL/LGPL components, regardless of its Python
+wheel's BSD classifier. Component notices and source provenance remain separate
+under app/licenses and docs/THIRD_PARTY_NOTICES.md. The project license grants no
+rights over Apple's native component. See
+[the current release review](docs/reviews/NATIVE_LICENSE_REVIEW_2026-11-22.md).
+A source review archive is not an approved Stable installer. Stable starts fresh;
+Edge data/entities/history are never migrated into it.

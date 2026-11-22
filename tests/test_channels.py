@@ -19,6 +19,7 @@ class ChannelTests(unittest.TestCase):
             self.assertIn("name: Retrace Edge",config)
             self.assertIn("version: 0.1.2-dev.2.1",config)
             self.assertIn("stage: experimental",config)
+            self.assertIn("backup: cold",config)
             manifest=json.loads((target/"custom_components/retrace/manifest.json").read_text())
             self.assertEqual(manifest["version"],"0.1.2-dev.2.1")
             self.assertFalse((target/"tools").exists())

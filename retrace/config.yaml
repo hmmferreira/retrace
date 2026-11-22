@@ -34,4 +34,5 @@ schema:
   install_reviewed_component: bool
   private_evaluation: bool
   experimental_macos_signer: bool
+backup: cold
 stage: experimental

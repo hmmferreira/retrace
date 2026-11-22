@@ -1,4 +1,18 @@
-# Redistribution review — 2026-11-17
+# Current shared-runtime review — 2026-11-22
+
+Use [the current native/dependency review](reviews/NATIVE_LICENSE_REVIEW_2026-11-22.md)
+for the working macOS provider. It includes the exact Apple artifact, MIT protocol,
+GPL Mac engine/Unicorn distinctions, installed-package notice inventory, SBOM,
+security fixes and remaining permission question. The Rust exporter/helper below
+are absent from the shared runtime and do not block that runtime's review.
+
+The runtime inventory contains32 installed Python distributions (31 locked plus
+base-image pip),106 Debian packages and66 Python notice files. See reviews/ for
+machine-readable evidence. Public prebuilt native images remain unapproved;
+source-build packaging does not establish Apple-component use permission.
+
+## Historical legacy redistribution review — 2026-11-17
+
 
 This is an evidence inventory, not a completed license/compliance review.
 The project's MIT license covers its own code; it does not grant rights over

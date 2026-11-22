@@ -46,6 +46,16 @@ or isolation changes also need their matching candidate/isolation tests. Never
 use household secrets as fixtures. Report what was tested and what remains live
 or manual validation; a passing synthetic suite is not a complete security audit.
 
+## Release scope chosen by the owner (2026-11-22)
+
+Stable starts with fresh state and its own entities/history. Edge entities stay
+Edge, are disposable development data, and must never be migrated or renamed into
+Stable entities. Do not delete the running Edge installation without an explicit
+request. Extended real-world reliability/soak testing continues after the first
+release; do not invent an open-ended soak requirement as a release gate. Existing
+automated security checks and unresolved native licensing still apply. Prioritize
+native/dependency security/license review, then source-build stable packaging.
+
 ## Delivery
 
 Keep original Edge, Shared Edge and stable storage/identities distinct. Use the

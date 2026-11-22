@@ -45,3 +45,17 @@ uses pip with hash-checked wheels, and does not execute those build/install path
 This is an applicability assessment, not removal of the affected package. Review
 by 2026-12-17; a new advisory or version is never covered by these notes. Replacing
 the legacy fs/pkg_resources dependency remains preferable to indefinite notes.
+
+
+## Shared release review — 2026-11-22
+
+Rechecked all31 locked versions, including the shared protobuf lock: no unreviewed
+OSV findings and3 existing exact/expiring applicability notes. Recorded32 installed
+Python distributions (including base-image pip),106 Debian packages and66 notice
+files from a disposable networkless shared image. The inventory and CycloneDX
+snapshot are under docs/reviews. Retained installed Python notices in app/licenses;
+added the missing upstream Unicorn native-engine GPL/LGPL/author/provenance files.
+Do not infer the native engine's license from its wheel's BSD classifier.
+Shared base images now have exact digest pins; apt repositories remain mutable.
+No package upgrade, Apple binary redistribution or household state inspection was
+performed in this review. These changes are source preparation, not a live update.

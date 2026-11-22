@@ -5,6 +5,9 @@ from retrace.shared_runtime import require_shared_backend,configure_runtime
 from retrace.artifact_policy import reviewed_artifact,ArtifactBlocked
 from retrace.native_worker import _NativeChannel
 
+from pathlib import Path
+for notice in ('PYTHON_NOTICES.txt','unicorn-2.1.4/COPYING','unicorn-2.1.4/COPYING.LGPL2','unicorn-2.1.4/COPYING_GLIB','unicorn-2.1.4/PROVENANCE.json'):
+    assert (Path('/app/licenses')/notice).is_file()
 assert os.getuid()==1000
 require_shared_backend()
 assert configure_runtime({'runtime_mode':'shared'})=='shared'

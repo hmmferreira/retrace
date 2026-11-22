@@ -82,3 +82,14 @@ the existing integration verifies the same instance and updates its connection
 without new entities or copying tokens through the browser. Discovery retries
 if Supervisor is temporarily unavailable. The read-only API has no renewal
 endpoint. Apple credentials and source item keys are not changed.
+
+
+## Fresh Stable setup (owner decision, 2026-11-22)
+
+Stable and Edge are independent installations. Do not transfer Edge history,
+credentials, device selections or entity IDs into Stable. Edge entities remain
+explicitly Edge and are disposable development data; a fresh Stable setup creates
+its own entities/history. Keep companion integration code on a compatible released
+version for everyday use; app channel separation alone does not provide separate
+Core integration code versions. Preparing a release never deletes the working
+Edge setup implicitly. Extended soak/recovery observation continues after release.

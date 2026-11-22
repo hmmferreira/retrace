@@ -33,3 +33,12 @@ public snapshot. Fault injection also verifies failed selection, metadata and
 report writes are not published in memory. This does not validate Supervisor's
 archive/encryption implementation or actual Apple session validity. A live
 Supervisor backup/restore round trip is still a release checklist item.
+
+
+## Generation cleanup and backup mode — source review, 2026-11-22
+
+The prepared app config sets `backup: cold`. Supervisor stops the app while
+capturing its private files, avoiding an archive racing machine-generation
+publication/cleanup. Tracking pauses during that backup. This is packaging
+preparation; it does not change the currently installed Edge app or prove a live
+restore. Preserve the whole private app directory and keep backups confidential.
