@@ -1,5 +1,5 @@
 name: Retrace
-version: 0.2.0
+version: 0.2.1
 slug: retrace
 description: Location history in Home Assistant with Apple Find My support
 url: https://github.com/hmmferreira/retrace

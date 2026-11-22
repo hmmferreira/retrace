@@ -1,7 +1,7 @@
 "use strict";
 let providerTouched=false;
 let csrf="", snapshot=null, loginMethod=null, busy=false, selectionDirty=false;
-let forceDiscoveryLogin=false, reconnecting=false, recoveryKey="", map=null, markers=null;
+let forceDiscoveryLogin=false, reconnecting=false, recoveryKey="";
 let refreshing=false, emailHint="", authKey="", factorKey="", factorPhase="idle", layoutShared=null, activeFeedback=null;
 const itemFeedback=new Map();
 const $=id=>document.getElementById(id);
@@ -207,7 +207,7 @@ function render(data){
     $("discovery-state").textContent="Shared Apple sign-in";
   }
   renderRecovery(data.recovery);
-  renderMap();updateButtons();
+  updateButtons();
 }
 function renderRecovery(flow){
   const messages={"idle":"","working":"Contacting Apple. Keep this page open…","complete":"Discovery complete. Choose items below and save your tracking choices.","failed":"Discovery did not finish. Try the saved session again, or choose Sign in again if Apple expired it.","timed_out":"Apple did not respond in time. Try again.","expired":"Discovery expired. Start it again.","cancelled":"Discovery cancelled.","busy":"Another user is completing discovery."};
@@ -241,20 +241,8 @@ function renderRecovery(flow){
   input.name="response";label.append(input);form.append(label,text("button",flow.kind==="verification_code"?"Verify SMS code":flow.kind==="device_passcode"?"Unlock item keys":"Continue"));
   form.onsubmit=event=>{event.preventDefault();if(busy)return;const value=input.value;input.value="";action(()=>api("ui/recovery",{action:"answer",value}),"Verifying with Apple…",null,"recovery-status");};
 }
-function renderMap(){
-  if(!$("map-preview").open||!window.L||!snapshot)return;
-  if(!map){map=L.map("map");L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap contributors",maxZoom:19}).addTo(map);markers=L.layerGroup().addTo(map);map.setView([20,0],2);}
-  markers.clearLayers();const points=[];
-  for(const item of snapshot.items.filter(item=>item.enabled&&item.report)){
-    const p=[item.report.latitude,item.report.longitude];points.push(p);
-    L.marker(p).bindPopup(text("span",item.name+" · "+ago(item.report.timestamp))).addTo(markers);
-    L.circle(p,{radius:item.report.accuracy,weight:1}).addTo(markers);
-  }
-  map.invalidateSize();if(points.length&&!map._fitted){map.fitBounds(points,{padding:[30,30],maxZoom:15});map._fitted=true;}
-}
 async function refresh(){if(refreshing)return;refreshing=true;try{render(await api("v1/snapshot"));}catch(error){$("health").textContent="App unavailable";statusBadge("checks-badge","Checks: app unavailable","error");notice(error.message,"error");}finally{refreshing=false;}}
-document.querySelectorAll("[data-tab]").forEach(button=>button.onclick=()=>{setFeedback("message","");for(const id of ["overview","setup"])$(id).hidden=id!==button.dataset.tab;document.querySelectorAll("[data-tab]").forEach(other=>other.setAttribute("aria-selected",String(other===button)));renderMap();});
-$("map-preview").ontoggle=renderMap;
+document.querySelectorAll("[data-tab]").forEach(button=>button.onclick=()=>{setFeedback("message","");for(const id of ["overview","setup"])$(id).hidden=id!==button.dataset.tab;document.querySelectorAll("[data-tab]").forEach(other=>other.setAttribute("aria-selected",String(other===button)));});
 function configureNativeConsent(data){
   const required=Boolean(data?.setup?.shared_auth&&data.setup.native_component_consent_required&&$("authentication-provider").value==="macos");
   $("native-component-notice").hidden=!required;

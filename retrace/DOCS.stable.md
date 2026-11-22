@@ -43,3 +43,16 @@ Do not install incompatible integration development code into everyday HA.
 This is an independent project, not affiliated with Apple or independently
 security audited. Apple compatibility and real-world recovery remain ongoing
 validation. See the repository's security review and v0.2.0 release notes.
+
+## Native map and location trails
+
+Items → Open Home Assistant map leaves the app Web UI and opens Home Assistant's
+map. The app does not embed the dashboard card or download separate map tiles.
+Approve the discovered Retrace integration in Settings → Devices & services first.
+Each installation has its own trackers; Edge trackers retain their Edge names.
+
+For a dedicated map with trails, edit a Home Assistant dashboard, add the built-in
+Map card, select this installation's Retrace device trackers, and set Hours to
+show (for example 24). Home Assistant handles desktop/mobile rendering and history.
+Only reported locations can be shown. History begins when the tracker is recorded
+and is limited by Recorder retention; the app cannot backfill older Apple history.

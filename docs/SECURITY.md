@@ -40,8 +40,9 @@ storage, no request/access logs, and generic error responses. PTY parsing expose
 only known prompts and recovery-device labels. Raw output, serials and upstream
 exception bodies are withheld. textContent prevents item-name HTML injection.
 Recovery inputs reject newlines/NUL; ownership prevents cross-user responses.
-CSP/no-store headers are set. Map executable assets are local; OpenStreetMap sees
-browser tile requests. No reverse geocoding is done.
+CSP/no-store and no-referrer headers are set. The app loads no map tiles or external
+map scripts. Map rendering and history use the Home Assistant frontend and its
+map providers. No reverse geocoding is done.
 
 Authentication logs use fixed substeps (account setup, Apple sign-in and method
 listing). Typed Apple refusals can include only the fixed init/complete label and
