@@ -1,0 +1,46 @@
+{
+  "title": "Retrace",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect Retrace",
+        "description": "Install and open the Retrace app first. Supervisor discovery normally pairs it automatically. Manual pairing credentials grant read-only access to item locations.",
+        "data": {
+          "host": "App hostname",
+          "token": "Read-only pairing token"
+        }
+      },
+      "hassio_confirm": {
+        "title": "Connect the Retrace app",
+        "description": "Add tracking entities for this app instance. Development devices are marked Edge. Manage your Apple account and select items in the app. Existing trackers are preserved."
+      },
+      "reauth_confirm": {
+        "title": "Reconnect the app",
+        "description": "Enter the app's replacement read-only pairing token. Apple account reauthentication happens in the app.",
+        "data": {
+          "token": "Pairing token"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot connect to the app. Check that it is running.",
+      "invalid_auth": "The pairing credential was rejected."
+    },
+    "abort": {
+      "already_configured": "This app is already connected.",
+      "reauth_successful": "App connection restored.",
+      "wrong_instance": "This is a different app instance.",
+      "cannot_connect": "Cannot verify the rediscovered app. Existing connection settings were preserved."
+    }
+  },
+  "issues": {
+    "apple_reauth": {
+      "title": "Retrace needs you to sign in again",
+      "description": "Open the Retrace app and reconnect your Apple account. Apple passwords are not retained. Existing locations remain dated by their original sighting time."
+    },
+    "poll_failed": {
+      "title": "Retrace could not refresh locations",
+      "description": "Open the app to check its status. It will retry with backoff. A successful poll does not guarantee a new Apple sighting."
+    }
+  }
+}

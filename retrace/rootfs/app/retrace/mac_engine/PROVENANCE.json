@@ -1,0 +1,11 @@
+{
+  "repository": "https://github.com/parawanderer/os-findmy-e",
+  "revision": "595d39810639d750715babc30b063d4ac8f2c437",
+  "license": "GPL-2.0-only",
+  "files": {
+    "adi_run.py": "eb5b7ec35cd488508d1b6927d23da55d551fb385c1b17fb74c5bea0a001760ae",
+    "harness.py": "2df372afa7f67a19135bf2c744a6ce9f3d5bb7a53a9a32d870bd8566c7c8e139",
+    "stubs.py": "be2ef85170b2dfa2fc23514d487dedada0d9d1f60aeefdebec8fe318a892f24c",
+    "macho.py": "6775e284e904debbae59234cb8d0732df5c199f7aaa9c285767d1f3bea09b6d4"
+  }
+}

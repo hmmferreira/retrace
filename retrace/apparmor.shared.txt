@@ -1,0 +1,43 @@
+#include <tunables/global>
+
+# Shared-runtime channel only. Publishing must copy this to apparmor.txt; legacy
+# channel packaging must not activate this profile accidentally.
+profile retrace flags=(attach_disconnected,mediate_deleted) {
+  # The trusted account/UI parent retains normal container access. Native work
+  # receives only the restrictive nested profile below, never these permissions.
+  #include <abstractions/base>
+  file,
+  network,
+  capability,
+  deny mount,
+  deny /proc/sys/** w,
+  deny /proc/sysrq-trigger rwklx,
+  deny /proc/kcore rwklx,
+  deny /sys/** wklx,
+  signal (receive),
+  signal (send) peer=@{profile_name},
+  signal (send) peer=@{profile_name}//retrace-native,
+  change_profile -> @{profile_name}//retrace-native,
+
+  profile retrace-native flags=(attach_disconnected,mediate_deleted) {
+    /usr/local/lib/** mr,
+    /usr/lib/** mr,
+    /lib/** mr,
+    /lib64/** mr,
+    /probe/** r,
+    /app/retrace/** r,
+    /etc/ld.so.cache r,
+    /etc/localtime r,
+    /dev/urandom r,
+    /dev/null rw,
+    owner /proc/[0-9]*/attr/{current,apparmor/current} r,
+    owner /proc/[0-9]*/task/[0-9]*/attr/{current,apparmor/current} r,
+    signal (receive),
+    deny network,
+    deny capability,
+    deny /data/** rw,
+    deny /home/** rw,
+    deny /root/** rw,
+    # No execute, write, change_profile or transition-back permission.
+  }
+}

@@ -1,0 +1,5 @@
+# Additional shared-runtime dependency; official PyPI wheel hashes.
+# The protocol source/revision/archive hash is independently pinned in Dockerfile.shared.
+protobuf==7.36.2 \
+    --hash=sha256:89f23aa53c24553a2416fd4fd1ec06f74fa42b14b546d8883128813f775bbfd2 \
+    --hash=sha256:bdb3a345d48db958e6ce1f18e508beb0cc981d64f24088427549c866cd039f1e

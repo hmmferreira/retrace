@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "artifacts": [
+    {
+      "id": "applemusic-arm64-v8a",
+      "review_status": "private-evaluation",
+      "host_architectures": [
+        "amd64"
+      ],
+      "guest_architecture": "arm64-v8a",
+      "wrapper": {
+        "name": "anisette",
+        "version": "1.2.4",
+        "wheel_sha256": "f61e620aa736f0cac0ca102dd44a02cc2caea1a072eab0f1ef7f2d8b534e03dc"
+      },
+      "source": {
+        "url": "https://apps.mzstatic.com/content/android-apple-music-apk/applemusic.apk",
+        "version": "4.9.6.1447",
+        "sha256": "9aab4e3bfd44b509dd657b030d46df536c5592512c256fc59012cce47a2e9c9c"
+      },
+      "bundle": {
+        "format": "anisette-library-bundle",
+        "sha256": "1cc48641b9803e951eaf96439463e05790e5b14452155261dcc271cec53ad563",
+        "member_sha256": {
+          "lib/arm64-v8a/libCoreADI.so": "9d5b557cf3faf88c34c394ab2cd7fc1a3b4acf3aed51f28cd0bc093858107c22",
+          "lib/arm64-v8a/libstoreservicescore.so": "bd335e6963ba5ae2f5babca613435ad56d2660a9aee37df35f876c458d105ce4"
+        }
+      },
+      "review": {
+        "id": "private-edge-technical-review-2026-11-20",
+        "date": "2026-11-20",
+        "evidence": "docs/ARTIFACT_PROVENANCE.md"
+      },
+      "license": {
+        "wrapper": "MIT",
+        "native_review": "terms-reviewed-no-clearance",
+        "redistribution": "local-use-only"
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "domain": "retrace",
+  "name": "Retrace",
+  "codeowners": [
+    "@hmmferreira"
+  ],
+  "config_flow": true,
+  "dependencies": [
+    "hassio"
+  ],
+  "documentation": "https://github.com/hmmferreira/retrace",
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/hmmferreira/retrace/issues",
+  "requirements": [],
+  "version": "0.2.0"
+}

@@ -1,0 +1,42 @@
+name: Retrace
+version: 0.2.0
+slug: retrace
+description: Location history in Home Assistant with Apple Find My support
+url: https://github.com/hmmferreira/retrace
+homeassistant: 2026.9.3
+arch:
+  - amd64
+startup: application
+boot: auto
+init: false
+ingress: true
+ingress_port: 8099
+panel_icon: mdi:radar
+panel_title: Retrace
+panel_admin: true
+hassio_api: false
+homeassistant_api: false
+discovery:
+  - retrace
+ports:
+  8100/tcp: null
+options:
+  runtime_mode: shared
+  shared_artifact_id: applemusic-arm64-v8a
+  create_new_identity: true
+  install_reviewed_component: false
+  private_evaluation: false
+  experimental_macos_signer: false
+  apple_music_provider: false
+  macos_provider: true
+schema:
+  runtime_mode: list(legacy|shared)
+  shared_artifact_id: str
+  create_new_identity: bool
+  install_reviewed_component: bool
+  private_evaluation: bool
+  experimental_macos_signer: bool
+  apple_music_provider: bool
+  macos_provider: bool
+backup: cold
+stage: stable
